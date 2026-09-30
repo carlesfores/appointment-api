@@ -18,7 +18,7 @@ const APPOINTMENTS_MOCK = [
 
 router.get('/', function(req, res, next) {
   res.json({
-    data: APPOINTMENTS_MOCK,
+    results: APPOINTMENTS_MOCK,
     status: 'ok'
   });
 });
