@@ -1,132 +1,131 @@
 # Appointment API
 
-API REST sencilla con Express y PostgreSQL para gestionar citas.
+A simple REST API built with Express and PostgreSQL for managing appointments.
 
-## Requisitos
+## Requirements
 
-- Node.js 18 o superior.
-- PostgreSQL instalado y en ejecución.
+- Node.js 18 or later.
+- PostgreSQL installed and running.
 
-## Preparar PostgreSQL
+## Set up PostgreSQL
 
-1. Crea una base de datos, por ejemplo:
+1. Create a database, for example:
 
    ```sql
    CREATE DATABASE appointment_api;
    ```
 
-2. Configura las variables de conexión en tu terminal. Puedes partir de
-   [.env.example](./.env.example); el proyecto no carga `.env` automáticamente,
-   así que exporta las variables o configúralas en el entorno de ejecución. En
-   Linux/macOS, por ejemplo:
+2. Configure the connection variables in your terminal. You can use
+   [`.env.example`](./.env.example) as a starting point; the project does not
+   load `.env` automatically, so export the variables or configure them in your
+   runtime environment. For example, on Linux/macOS:
 
    ```sh
    export PGHOST=localhost
    export PGPORT=5432
    export PGDATABASE=appointment_api
    export PGUSER=postgres
-   export PGPASSWORD=tu_password
+   export PGPASSWORD=your_password
    ```
 
-   También puedes definir `DATABASE_URL`, por ejemplo
-   `postgres://postgres:tu_password@localhost:5432/appointment_api`.
+   You can also set `DATABASE_URL`, for example
+   `postgres://postgres:your_password@localhost:5432/appointment_api`.
 
-3. Aplica el esquema:
+3. Apply the schema:
 
    ```sh
    psql "$DATABASE_URL" -f db/schema.sql
    ```
 
-   Si usas variables `PG*` en lugar de `DATABASE_URL`, ejecuta:
+   If you use `PG*` variables instead of `DATABASE_URL`, run:
 
    ```sh
    psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" -f db/schema.sql
    ```
 
-4. Instala dependencias e inicia la API:
+4. Install dependencies and start the API:
 
    ```sh
    npm install
    npm start
    ```
 
-## CRUD de citas
+## Appointments CRUD
 
-La API escucha en `http://localhost:3000/appointments`. Una cita tiene esta
-forma: `{ "name": "Consulta", "date": "2026-10-02", "hour": "09:30" }`. `date`
-y `hour` pueden ser `null` u omitirse; `name` es obligatorio.
+The API is available at `http://localhost:3000/appointments`. An appointment
+has this shape: `{ "name": "Consultation", "date": "2026-10-02", "hour": "09:30" }`.
+`date` and `hour` can be `null` or omitted; `name` is required.
 
-| Operación | Método y ruta | Resultado |
+| Operation | Method and route | Result |
 |---|---|---|
-| Listar | `GET /appointments` | `results` con todas las citas |
-| Consultar | `GET /appointments/:id` | `result` con una cita |
-| Crear | `POST /appointments` | `201` y la cita creada |
-| Actualizar | `PUT /appointments/:id` | Reemplaza los campos de la cita |
-| Eliminar | `DELETE /appointments/:id` | `204` sin contenido |
+| List | `GET /appointments` | `results` containing all appointments |
+| Get one | `GET /appointments/:id` | `result` containing one appointment |
+| Create | `POST /appointments` | `201` and the created appointment |
+| Update | `PUT /appointments/:id` | Replaces the appointment fields |
+| Delete | `DELETE /appointments/:id` | `204` with no content |
 
 Ejemplo:
 
 ```sh
 curl -X POST http://localhost:3000/appointments \
   -H 'Content-Type: application/json' \
-  -d '{"name":"Consulta","date":"2026-10-02","hour":"09:30"}'
+  -d '{"name":"Consultation","date":"2026-10-02","hour":"09:30"}'
 ```
 
-Los errores de validación devuelven `400`; una cita inexistente devuelve `404`.
-Los valores SQL se envían como parámetros para evitar construir consultas con
-datos de usuario.
+Validation errors return `400`; a missing appointment returns `404`. SQL values
+are passed as parameters rather than being interpolated into queries.
 
-## Aprender a planificar con agentes
+## Learn to plan with agents
 
-Este repositorio incluye un agente personalizado en
+This repository includes a custom agent at
 [`.github/agents/backend-api.agent.md`](./.github/agents/backend-api.agent.md).
-El agente es un perfil de instrucciones: puede explorar el proyecto, proponer
-un plan y, cuando se lo pidas, implementar y verificar cambios. No es un proceso
-autónomo que ejecute tareas sin supervisión.
+The agent is an instruction profile: it can explore the project, propose a
+plan, and implement and verify changes when you ask it to. It is not an
+autonomous process that runs tasks without supervision.
 
-### Crear y usar el agente en VS Code
+### Create and use the agent in VS Code
 
-1. Abre este repositorio en VS Code con GitHub Copilot habilitado.
-2. Crea `.github/agents/` si todavía no existe y dentro crea
-   `backend-api.agent.md`. El nombre del archivo será el identificador visible
-   del agente en el selector de agentes.
-3. Añade un encabezado YAML con `name` y `description`, y debajo instrucciones
-   concretas sobre el rol, el contexto del proyecto y cómo debe trabajar.
-   Puedes empezar copiando el agente ya preparado en este repositorio.
-4. Guarda el archivo. Abre Copilot Chat en modo Agent y elige `Backend API` en
-   el selector. Si no aparece, vuelve a cargar la ventana de VS Code.
-5. Empieza pidiendo un plan, no código. Por ejemplo:
+1. Open this repository in VS Code with GitHub Copilot enabled.
+2. Create `.github/agents/` if it does not exist yet, then add
+   `backend-api.agent.md` inside it. The filename becomes the agent's visible
+   identifier in the agent picker.
+3. Add YAML frontmatter with `name` and `description`, followed by clear
+   instructions about the agent's role, project context, and working process.
+   You can start by copying the agent already included in this repository.
+4. Save the file. Open Copilot Chat in Agent mode and select `Backend API` from
+   the picker. If it does not appear, reload the VS Code window.
+5. Start by asking for a plan, not code. For example:
 
-   > Analiza cómo está montada la API. No edites archivos todavía. Propón un
-   > plan para añadir autenticación, con tareas pequeñas, dependencias, archivos
-   > afectados, riesgos y pruebas.
+   > Analyze how this API is structured. Do not edit any files yet. Propose a
+   > plan for adding authentication, with small tasks, dependencies, affected
+   > files, risks, and tests.
 
-6. Revisa y ajusta el plan. Pide implementar una tarea cada vez, confirma antes
-   de cambios importantes y revisa el diff. Termina solicitando pruebas y una
-   explicación de qué quedó pendiente.
+6. Review and adjust the plan. Ask the agent to implement one task at a time,
+   confirm before major changes, and review the diff. Finish by asking it to run
+   tests and explain anything that remains.
 
-### Cómo dividir y planificar el trabajo
+### How to break down and plan the work
 
-Para la API de citas de este ejemplo, un plan útil separa áreas con entregables
-verificables y respeta sus dependencias:
+For this appointments API, a useful plan separates work into areas with
+verifiable deliverables and respects their dependencies:
 
-1. **Persistencia**: definir columnas y restricciones y crear `db/schema.sql`.
-   Hecho cuando una base PostgreSQL nueva puede aplicar el esquema.
-2. **Conexión**: añadir `pg`, configurar el pool y documentar variables. Depende
-   de decidir cómo se representa el esquema y la conexión.
-3. **Endpoints**: implementar listado, consulta por id, creación, actualización
-   y eliminación con validación y consultas parametrizadas. Depende de la
-   conexión y el esquema.
-4. **Verificación y documentación**: probar respuestas, errores y persistencia,
-   y actualizar los ejemplos de uso. Depende de los endpoints implementados.
+1. **Persistence**: define columns and constraints, and create `db/schema.sql`.
+   Done when a new PostgreSQL database can apply the schema.
+2. **Connection**: add `pg`, configure the pool, and document the environment
+   variables. This depends on deciding how the schema and connection are
+   represented.
+3. **Endpoints**: implement listing, lookup by ID, creation, updating, and
+   deletion, with validation and parameterized queries. This depends on the
+   connection and schema.
+4. **Verification and documentation**: test responses, errors, and persistence,
+   then update the usage examples. This depends on the endpoints being
+   implemented.
 
-En cada tarea define objetivo, alcance, archivos probables, dependencias,
-criterio de aceptación y cómo probarla. Las dependencias importan: no tiene
-sentido probar la persistencia antes de tener el esquema y la conexión. Mantén
-las tareas acotadas para que puedas revisar los cambios del agente y detectar
-errores antes de que se propaguen.
+For each task, define its goal, scope, likely files, dependencies, acceptance
+criteria, and how to test it. Dependencies matter: there is little value in
+testing persistence before the schema and connection are ready. Keep tasks
+small so you can review the agent's changes and catch errors before they spread.
 
-Un buen ciclo de trabajo es: **explorar → planificar → aprobar → implementar →
-probar → revisar el diff**. Pide al agente que señale supuestos en vez de
-inventar requisitos, y comprueba tú que las pruebas cubren el comportamiento
-que esperas.
+A good workflow is: **explore → plan → approve → implement → test → review the
+diff**. Ask the agent to call out assumptions instead of inventing requirements,
+and verify that the tests cover the behavior you expect.
